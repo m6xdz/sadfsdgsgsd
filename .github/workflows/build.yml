@@ -1,0 +1,33 @@
+name: Build LAME EXE
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    # 1. Скачиваем исходный код репозитория на виртуальную машину
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 2. Настраиваем инструмент сборки MSBuild (от Visual Studio)
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    # 3. Запускаем компиляцию решения в режиме Release (x64)
+    - name: Build Solution
+      run: msbuild lame.sln /p:Configuration=Release /p:Platform=x64
+
+    # 4. Сохраняем готовый .exe файл в виде архива-артефакта
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: lame-exe-release
+        path: |
+          **/Release/**/*.exe
+          **/x64/Release/**/*.exe
